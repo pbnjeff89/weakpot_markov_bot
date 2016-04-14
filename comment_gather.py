@@ -21,12 +21,25 @@
 import praw
 import os.path
 from pymarkovchain import MarkovChain
+import re
 
 def writeComments(f, commentList):
 	
-	for comment in comments:
+	for comment in commentList:
 		
-		f.write(comment.body + '\n')
+		commentBody = comment.body
+		
+		links = re.findall('\[.*?\]\(.*?\)', commentBody)
+		
+		for link in links:
+		
+			commentBody = commentBody.replace(link,
+					link[link.find("[") + 1:link.find("]")])
+
+		try:
+			f.write(commentBody + '\n')
+		except UnicodeEncodeError:
+			continue
 
 comments_path = "c:/users/jeff/dropbox/weakpots_legion_bot/comments.txt"
 user_agent = "Comment-Gatherer for Markov Chain by /u/pbnjeff"
